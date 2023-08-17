@@ -8,21 +8,23 @@
 uint LED_SEGMENTS[SEGMENT_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7};
 uint LED_DIGITS[DIGIT_COUNT] = {8, 9, 10, 11};
 
-uint DIGIT_SEGMENTS[DIGIT_COUNT][SEGMENT_COUNT] = {
-    {1, 1, 1, 1, 1, 1}, // Digit 0
-    {0, 1, 1},          // Digit 1
+// Display upsidedown so DP appears as degrees
+uint DISPLAY_VALUES[12][SEGMENT_COUNT] = {
+    {1, 1, 1, 1, 1, 1},    // Digit 0
+    {0, 0, 0, 0, 1, 1, 0}, // Digit 1
     {1, 1, 0, 1, 1, 0, 1},
-    {1, 1, 1, 1, 0, 0, 1},
-};
+    {1, 0, 0, 1, 1, 1, 1},
+    {0, 0, 1, 0, 1, 1, 1},    // 4
+    {1, 0, 1, 1, 0, 1, 1},    // 5
+    {1, 1, 1, 1, 0, 1, 1, 0}, // 6
+    {0, 0, 0, 1, 1, 1},       // 7
+    {1, 1, 1, 1, 1, 1, 1, 0}, // 8
+    {1, 0, 1, 1, 1, 1, 1},    // 9
+    {1, 1, 1, 1, 0, 0, 0, 1}, // .C
+    {}};
 
 void show_digit(uint digit)
 {
-    // Enable segments for chosen digit
-    for (int s = 0; s < SEGMENT_COUNT; s++)
-    {
-        gpio_put(LED_SEGMENTS[s], DIGIT_SEGMENTS[digit][s]);
-    }
-
     // Enable chosen digit
     gpio_put(LED_DIGITS[digit], 0);
 }
@@ -34,6 +36,20 @@ void clear_digits()
     {
         gpio_put(LED_DIGITS[d], 1);
     }
+}
+
+void display_value(uint8_t digit, uint8_t value)
+{
+    show_digit(digit);
+
+    // Enable segments for chosen digit
+    for (int s = 0; s < SEGMENT_COUNT; s++)
+    {
+        gpio_put(LED_SEGMENTS[s], DISPLAY_VALUES[value][s]);
+    }
+
+    sleep_ms(5);
+    clear_digits();
 }
 
 int main(void)
@@ -58,24 +74,34 @@ int main(void)
         gpio_set_dir(LED_DIGITS[d], GPIO_OUT);
     }
 
+    int check_temp = 100;
+    int temp = 0;
     while (1)
     {
-        uint16_t raw = adc_read();
-        const float conversion = 3.3f / (1 << 12);
-        float voltage = raw * conversion;
-
-        // Equeation given in datasheet
-        float temp = 27 - (voltage - 0.706) / 0.001712;
-
-        printf("Temperature: %f C\n", temp);
-
-        for (int i = 0; i < 4; i++)
+        // Update temperature every 100
+        if (check_temp == 100)
         {
-            show_digit(i);
-            sleep_ms(1000);
+            uint16_t raw = adc_read();
+            const float conversion = 3.3f / (1 << 12);
+            float voltage = raw * conversion;
+
+            // Equeation given in datasheet
+            temp = 27 - (voltage - 0.706) / 0.001712;
+            printf("Temperature: %d C\n", temp);
+
+            check_temp = 0;
         }
 
-        sleep_ms(1000);
-        clear_digits();
+        int num1 = temp / 10;
+        int num2 = temp % 10;
+
+        display_value(0, 10); // .C
+        display_value(1, num2);
+        display_value(2, num1);
+        display_value(3, 12); // Blank
+
+        check_temp++;
     }
+
+    return 0;
 }
