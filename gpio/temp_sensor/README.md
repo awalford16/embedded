@@ -7,6 +7,7 @@ Works with the Raspberry Pi Pico wired up to 5641AS 4-Digit LED display
 ### Pins
 
 Pin | Description
+---|---
 0 | A
 1 | B
 2 | C (...)
