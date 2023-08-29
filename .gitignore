@@ -5,3 +5,10 @@ cmake-*
 build
 .DS_Store
 *.pdf
+
+CMakeFiles/
+elf2uf2/
+pioasm/
+pico-sdk/
+generated/
+*.cmake
