@@ -50,7 +50,7 @@ def on_message(client, userdata, message):
     state = message.payload.decode()
     print(f"Setting state to {state}")
 
-    # Set sensor pin high/low
+    # Convert mqtt message to int
     try:
         enable = int(state)
     except ValueError as verr:
@@ -60,12 +60,14 @@ def on_message(client, userdata, message):
     if enable > 1 or enable < 0:
         return
     
-    # Enable/disable motion sensor
+    # Enable/disable motion sensor by setting high/low
     motion_sensor_out.value(enable)
 
 
 last_state_on = False
 while True:
+    # TODO: Perform interrupt when motion sensor is enabled/disabled
+
     motion_detected = motion_sensor_in.value()  # Read the GPIO pin value
     
     if motion_detected and not last_state_on:
