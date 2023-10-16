@@ -52,6 +52,27 @@ def on_message(client, userdata, message):
         enable_irq(state)
 
 
+# Callback function to disable sesor reading
+def on_message(client, userdata, message):
+    global CURRENT_STATE
+    state = message.payload.decode()
+    print(f"Setting state to {state}")
+
+    # Convert mqtt message to int
+    try:
+        enable = int(state)
+    except ValueError as verr:
+        return
+
+    # Ignore if not 0 or 1
+    if enable > 1 or enable < 0:
+        return
+
+    # Enable/disable motion sensor by setting high/low
+    CURRENT_STATE = enable
+    motion_sensor_out.value(enable)
+
+
 # Create a Wi-Fi interface
 wlan = network.WLAN(network.STA_IF)
 
