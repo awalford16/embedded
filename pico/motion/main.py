@@ -78,19 +78,20 @@ while True:
     if CURRENT_STATE != 0:
         motion_detected = motion_sensor_in.value()  # Read the GPIO pin value
         
-        if motion_detected and CURRENT_STATE != 2:
-            connect_and_publish("FOCUS")
-            CURRENT_STATE = 2
+        if motion_detected:
+            if CURRENT_STATE != 2:
+                connect_and_publish("FOCUS")
+                CURRENT_STATE = 2
 
             active_time = 0
         else:
-            print("No motion.")
-
             if CURRENT_STATE == 2:
                 active_time += 5
+                print(active_time)
 
                 # Trigger deactivate event if inactive_time is exceeded
                 if active_time > inactive_time:
+                    print("Deactivating")
                     connect_and_publish("OFF")
                     CURRENT_STATE = 1
         
