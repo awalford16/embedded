@@ -10,7 +10,9 @@ The device can be in 3 different states:
 
 ### INACTIVE (0)
 
-This is when the device should not read from the motion sensor. This is useful for light triggers when the sensor does not need to be used during daytime hours
+This is when the device should not read from the motion sensor. This is useful for light triggers when the sensor does not need to be used during daytime hours.
+
+The inactive state works by disabling interrupts based on an MQTT message.
 
 ### SENSING (1)
 
