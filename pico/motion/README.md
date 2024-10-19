@@ -4,6 +4,8 @@
 
 Motion sensor code that works alongside an MQTT server to trigger particular events when motion is detected.
 
+The device will require authentication to the local WiFI, which is acheived by uploading a `wlan_config.py` file containing `WLAN_SSID` and `WLAN_PASSWORD`.
+
 ## State Machine
 
 The device can be in 3 different states:
